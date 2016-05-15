@@ -4,6 +4,7 @@ defmodule Monitor.User do
   schema "users" do
     field :name, :string
     field :email, :string
+    has_many :servers, Monitor.Server
 
     timestamps
   end

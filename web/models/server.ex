@@ -6,12 +6,13 @@ defmodule Monitor.Server do
     field :email, :string
     field :status, :string
     belongs_to :user, Monitor.User
+    has_many :services, Monitor.Service
 
     timestamps
   end
 
-  @required_fields ~w(name email status)
-  @optional_fields ~w()
+  @required_fields ~w(name  status user_id)
+  @optional_fields ~w(email)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

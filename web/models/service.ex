@@ -12,8 +12,8 @@ defmodule Monitor.Service do
     timestamps
   end
 
-  @required_fields ~w(name email status request_url expected_response)
-  @optional_fields ~w()
+  @required_fields ~w(name  status request_url expected_response server_id)
+  @optional_fields ~w(email)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

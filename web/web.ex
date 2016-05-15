@@ -23,6 +23,8 @@ defmodule Monitor.Web do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query, only: [from: 1, from: 2]
+
+      def all, do: from(__MODULE__)
     end
   end
 
@@ -52,6 +54,7 @@ defmodule Monitor.Web do
       import Monitor.Router.Helpers
       import Monitor.ErrorHelpers
       import Monitor.Gettext
+      import Monitor.ViewHelpers
     end
   end
 
