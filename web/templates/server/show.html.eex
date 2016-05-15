@@ -1,0 +1,28 @@
+<h2>Show server</h2>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @server.name %>
+  </li>
+
+  <li>
+    <strong>Email:</strong>
+    <%= @server.email %>
+  </li>
+
+  <li>
+    <strong>Status:</strong>
+    <%= @server.status %>
+  </li>
+
+  <li>
+    <strong>User:</strong>
+    <%= @server.user_id %>
+  </li>
+
+</ul>
+
+<%= link "Edit", to: server_path(@conn, :edit, @server) %>
+<%= link "Back", to: server_path(@conn, :index) %>

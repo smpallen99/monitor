@@ -1,0 +1,32 @@
+<h2>Listing servers</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+      <th>User</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for server <- @servers do %>
+    <tr>
+      <td><%= server.name %></td>
+      <td><%= server.email %></td>
+      <td><%= server.status %></td>
+      <td><%= server.user_id %></td>
+
+      <td class="text-right">
+        <%= link "Show", to: server_path(@conn, :show, server), class: "btn btn-default btn-xs" %>
+        <%= link "Edit", to: server_path(@conn, :edit, server), class: "btn btn-default btn-xs" %>
+        <%= link "Delete", to: server_path(@conn, :delete, server), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<%= link "New server", to: server_path(@conn, :new) %>
