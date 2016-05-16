@@ -1,14 +1,18 @@
 # App artifacts
-/_build
+/monitor_app/_build
+/service_app/_build
+/monitor_server_app/_build
 /db
-/deps
+/monitor_app/deps
+/service_app/deps
+/monitor_server_app/deps
 /*.ez
 
 # Generate on crash by the VM
 erl_crash.dump
 
 # Static artifacts
-/node_modules
+/monitor_app/node_modules
 
 # Since we are building assets from web/static,
 # we ignore priv/static. You may want to comment
