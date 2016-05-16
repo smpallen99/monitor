@@ -33,6 +33,13 @@
             <li><%= link "Users", to: user_path(@conn, :index) %></li>
           </ul>
         </nav>
+        <div class="server-alert alert alert-danger" style="display: none">
+          <br>
+          <strong>Oops!</strong> The Monitor Application is Down!
+          <br>
+          <br>
+        </div>
+
         <%= render @view_module, @view_template, assigns %>
       </main>
 

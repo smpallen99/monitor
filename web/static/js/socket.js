@@ -55,9 +55,24 @@ socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel("monitor:updates", {})
+let reload_needed = false
+socket.onError( msg => {
+  console.log("Received Channel onError event")
+  reload_needed = true
+  $('.server-alert').show()
+})
 channel.join()
-  .receive("ok", resp => { console.log("Joined successfully", resp) })
-  .receive("error", resp => { console.log("Unable to join", resp) })
+  .receive("ok", resp => {
+    if (reload_needed) {
+      reload_needed = false
+      location.reload()
+    }
+    $('.server-alert').hide()
+    console.log("Joined successfully", resp)
+  })
+  .receive("error", resp => {
+    console.log("Unable to join", resp)
+  })
 
 channel.on("server:status_update", msg => {
   console.log('server:update', msg)
