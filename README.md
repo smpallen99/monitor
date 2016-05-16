@@ -1,5 +1,7 @@
 # Monitor
 
+Refer to this [github link](https://github.com/smpallen99/monitor) for the source code.
+
 ## Introduction
 
 An Example Elixir/Phoenix Application to illustrate:
