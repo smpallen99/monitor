@@ -17,17 +17,55 @@ defmodule Monitor.ServerSm do
   def pong(pid),
     do: GenServer.cast(pid, :pong)
 
+  def stop(pid),
+    do: GenServer.cast(pid, :stop)
+
   def init([id]) do
     Registry.put :server, id, self()
+    GenServer.cast self(), :init
+    {:ok, %State{id: id}}
+  end
 
+  def handle_cast(:init, state) do
     services =
-      Repo.get!(Server, id)
+      Repo.get!(Server, state.id)
       |> Repo.preload(:services)
       |> Server.set_status(true)
       |> Repo.update!
       |> start_services
+    %State{state | services: services}
+    |> do_noreply
+  end
 
-    {:ok, %State{id: id, services: services}}
+  def handle_cast(:stop, state) do
+    {:stop, :normal, state}
+  end
+
+  def terminate(reason, state) do
+    Registry.delete(:server, state.id)
+
+    Repo.get!(Server, state.id)
+    |> Server.set_status(false)
+    |> Repo.update!
+
+    Repo.get!(Server, state.id)
+    |> Repo.preload(:services)
+    |> shutdown_services(state)
+
+    spawn fn ->
+      :timer.sleep(1000)
+      Registry.get(:server_sup, state.id)
+      |> Supervisor.stop
+
+      Registry.delete(:server_sup, state.id)
+    end
+  end
+
+  defp shutdown_services(server, state) do
+    for service <- server.services do
+      Registry.get(:service, service.id)
+      |> ServiceSm.stop()
+    end
   end
 
   def handle_cast(:pong, state) do
@@ -52,6 +90,7 @@ defmodule Monitor.ServerSm do
   end
 
   def handle_info({:timeout, _, :watchdog_timeout}, state) do
+    stop(self())
     server = Repo.get!(Server, state.id)
     case server.status do
       "online" ->
@@ -83,16 +122,21 @@ defmodule Monitor.ServerSm do
     end
   end
   defp start_services(server) do
+    Logger.info "starting services for server #{server.id}"
     for service <- server.services do
-      start_service(service)
+      start_service(server, service)
     end
   end
 
-  defp start_service(%Service{status: "inactive", id: id}) do
+  defp start_service(_, %Service{status: "inactive", id: id}) do
     id
   end
-  defp start_service(%Service{id: id}) do
-    ServiceSm.start_link id, self()
+  defp start_service(server, %Service{id: id}) do
+    Logger.info "starting service for server #{server.id}, id: #{id}"
+    # require IEx
+    # IEx.pry
+    Registry.get(:server_sup, server.id)
+    |> Monitor.ServerSmSupervisor.start_service_sm(id)
     id
   end
 end

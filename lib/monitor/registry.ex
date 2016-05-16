@@ -1,6 +1,6 @@
 defmodule Monitor.Registry do
 
-  @default %{server: %{}, service: %{}}
+  @default %{server: %{}, service: %{}, server_sup: %{}}
 
   def start_link do
     Agent.start_link(fn -> @default end, name: __MODULE__)

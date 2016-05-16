@@ -13,8 +13,8 @@ defmodule Monitor.ServiceSm do
   ##########
   # API
 
-  def start_link(id, parent) do
-    GenServer.start_link(__MODULE__, [id, parent])
+  def start_link(id) do
+    GenServer.start_link(__MODULE__, [id])
   end
 
   def enable(pid, enable?),
@@ -25,7 +25,8 @@ defmodule Monitor.ServiceSm do
   ##########
   # Callbacks
 
-  def init([id, parent]) do
+  def init([id]) do
+    Logger.info "ServiceSm starting #{id}"
     Registry.put :service, id, self()
     {:ok, start_poll_timer %State{id: id}}
   end
@@ -37,6 +38,14 @@ defmodule Monitor.ServiceSm do
 
   def handle_cast(:stop, state) do
     {:stop, :normal, state}
+  end
+
+  def terminate(reason, state) do
+    Registry.delete :service, state.id
+
+    Repo.get!(Service, state.id)
+    |> Service.set_status(false)
+    |> Repo.update!
   end
 
   def handle_info({:timeout, _ref, :poll_timeout}, state) do

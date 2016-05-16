@@ -1,20 +1,39 @@
 # Monitor
 
-To start your Phoenix app:
+## Introduction
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
-  * Install Node.js dependencies with `npm install`
-  * Start Phoenix endpoint with `mix phoenix.server`
+An Example Elixir/Phoenix Application to illustrate:
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+* How an Elixir application fits with the Phoenix Web Components.
+* How to setup non-trivial Elixir Supervisors
+* Using Phoenix Channels to dynamically update a client
 
-Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
+## Overview
 
-## Learn more
+`Monitor` is an example of a web site monitoring tool. It can be used
+to monitor server heat-beat as well as a number of web servers residing
+on a physical web server.
 
-  * Official website: http://www.phoenixframework.org/
-  * Guides: http://phoenixframework.org/docs/overview
-  * Docs: http://hexdocs.pm/phoenix
-  * Mailing list: http://groups.google.com/group/phoenix-talk
-  * Source: https://github.com/phoenixframework/phoenix
+### Definitions
+
+Monitor - The Elixir Application
+Server - A physical server that registers with the Monitor
+Service - A web server application residing on a Server
+
+## Design
+
+### Elixir Projects
+
+Monitor - The main Monitor Project
+Service - A simple Phoneix project simulating a web site
+MonitorServer - The Elixir client running on the server to be monitored
+
+### Workflow
+
+* Use the Monitor GUI to configure a Server and a number of Services.
+* The MonitorServer is configured with the id of the Server record configured in the Monitor GUI
+* Each Service to be monitored is provisioned with its request url and expected response. Each `Service` is started on the server.
+
+
+
+
