@@ -13,7 +13,9 @@ defmodule Monitor.ViewHelpers do
   def status_class("offline"), do: "bg-danger"
 
   def display_status(model) do
-    content_tag :span, class: "status " <> status_class(model.status) do
+    [_, data_type] = Module.split model.__struct__
+    content_tag :span, "data-id": "#{model.id}", "data-type": "#{data_type}",
+        class: "status " <> status_class(model.status) do
       model.status
     end
   end

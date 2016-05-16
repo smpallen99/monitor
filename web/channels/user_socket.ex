@@ -2,7 +2,7 @@ defmodule Monitor.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "rooms:*", Monitor.RoomChannel
+  channel "monitor:*", Monitor.MonitorChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

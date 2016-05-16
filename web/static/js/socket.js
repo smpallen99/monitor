@@ -54,9 +54,20 @@ let socket = new Socket("/socket", {params: {token: window.userToken}})
 socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
-let channel = socket.channel("topic:subtopic", {})
+let channel = socket.channel("monitor:updates", {})
 channel.join()
   .receive("ok", resp => { console.log("Joined successfully", resp) })
   .receive("error", resp => { console.log("Unable to join", resp) })
+
+channel.on("server:status_update", msg => {
+  console.log('server:update', msg)
+  let item = $('span.status[data-type="Server"][data-id="'+msg.id+'"]')
+  item.attr('class', msg.klass).text(msg.status)
+})
+channel.on("service:status_update", msg => {
+  console.log('service:update', msg)
+  let item = $('span.status[data-type="Service"][data-id="'+msg.id+'"]')
+  item.attr('class', msg.klass).text(msg.status)
+})
 
 export default socket

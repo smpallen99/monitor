@@ -31,16 +31,22 @@ defmodule Monitor.ServerSm do
   end
 
   def handle_cast(:pong, state) do
-    Logger.debug "pong from #{state.id}"
     server = Repo.get!(Server, state.id)
+    # Logger.debug "pong from #{state.id}, active?: #{state.active?}, status: #{server.status}"
     case server.status do
-      "offline" ->
-        Repo.update!(Server.set_status(server, false))
-        start_timer(state)
-      "online" ->
-        start_timer(state)
-      _ ->
+      "inactive" ->
         state
+      other ->
+        cond do
+          state.active? and (other == "offline") ->
+            Repo.update!(Server.set_status(server, true))
+          not state.active? and (other == "online")
+            Repo.update!(Server.set_status(server, false))
+          true ->
+            nil
+        end
+        start_timer(state)
+        |> struct(active?: true)
     end
     |> do_noreply
   end

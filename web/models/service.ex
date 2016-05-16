@@ -26,9 +26,13 @@ defmodule Monitor.Service do
   end
 
   def set_status(service, true) do
+    # Monitor.MonitorChannel.broadcast :service, %{id: service.id, status: "online"}
+    Monitor.Server.broadcast_update(:service, service, "online" )
     changeset(service, %{status: "online"})
   end
   def set_status(service, false) do
+    Monitor.Server.broadcast_update(:service, service, "offline" )
+    # Monitor.MonitorChannel.broadcast :service, %{id: service.id, status: "offline"}
     changeset(service, %{status: "offline"})
   end
 end
