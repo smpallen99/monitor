@@ -3,6 +3,7 @@
 <table class="table">
   <thead>
     <tr>
+      <th>ID</th>
       <th>Name</th>
       <th>Email</th>
       <th>Status</th>
@@ -15,8 +16,9 @@
   <tbody>
 <%= for server <- @servers do %>
     <tr>
+      <td><%= link "#{server.id}", to: server_path(@conn, :show, server) %></td>
       <td><%= server.name %></td>
-      <td><%= server.email || "<<DEFAULT>>" %></td>
+      <td><%= server.email |> String.slice(0, 22)  %></td>
       <td><%= display_status server %></td>
       <td><%= link server.user.name, to: user_path(@conn, :show, server.user) %></td>
       <td><%= Enum.count server.services %></td>

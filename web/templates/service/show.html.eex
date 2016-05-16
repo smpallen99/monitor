@@ -29,7 +29,7 @@
 
   <li>
     <strong>Server:</strong>
-    <%= @service.server_id %>
+    <%= link @service.server.name, to: server_path(@conn, :show, @service.server) %>
   </li>
 
 </ul>

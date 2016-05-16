@@ -17,6 +17,7 @@ defmodule Monitor.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/servers/:id/active", ServerController, :active
     resources "/users", UserController
     resources "/servers", ServerController
     resources "/services", ServiceController

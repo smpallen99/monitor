@@ -1,12 +1,15 @@
 defmodule Monitor.ServerController do
   use Monitor.Web, :controller
+  require Logger
 
-  alias Monitor.Server
+  alias Monitor.{Server, Registry, ServerSm}
 
   plug :scrub_params, "server" when action in [:create, :update]
 
   def index(conn, _params) do
-    servers = Repo.all(Server) |> Repo.preload([:user, :services])
+    servers =
+      from(s in Server, order_by: [asc: s.id], preload: [:user, :services])
+      |> Repo.all
     render(conn, "index.html", servers: servers)
   end
 
@@ -63,5 +66,24 @@ defmodule Monitor.ServerController do
     conn
     |> put_flash(:info, "Server deleted successfully.")
     |> redirect(to: server_path(conn, :index))
+  end
+
+  def active(conn, %{"id" => id}) do
+    Logger.debug "active request for id: #{inspect id}"
+    id = String.to_integer id
+    resp = case Repo.get(Server, id) do
+      nil ->
+        %{response: "invalid id"}
+      _ ->
+        case Registry.get :server, id do
+          nil ->
+            ServerSm.start_link(id)
+            %{response: "service started"}
+          pid ->
+            ServerSm.pong(pid)
+            %{response: "pong"}
+        end
+    end
+    json conn, resp
   end
 end

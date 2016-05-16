@@ -1,7 +1,6 @@
 defmodule Monitor.Service do
   use Monitor.Web, :model
 
-
   schema "services" do
     field :name, :string
     field :email, :string
@@ -13,9 +12,6 @@ defmodule Monitor.Service do
     timestamps
   end
 
-  @required_fields ~w(name  status request_url expected_response server_id)
-  @optional_fields ~w(email)
-
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -24,7 +20,15 @@ defmodule Monitor.Service do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, ~w(name  status request_url expected_response server_id email))
+    |> validate_required([:name, :request_url, :expected_response, :server_id])
+    |> validate_inclusion(:status, Monitor.Server.status_options)
   end
 
+  def set_status(service, true) do
+    changeset(service, %{status: "online"})
+  end
+  def set_status(service, false) do
+    changeset(service, %{status: "offline"})
+  end
 end

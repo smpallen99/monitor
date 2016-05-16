@@ -26,21 +26,26 @@ end
 servers =
 for _ <- 0..15 do
   u = Enum.random users
-  status = Enum.random Server.status_options
+  # status = Enum.random Server.status_options
   Repo.insert! %Server{name: Faker.Commerce.product_name_adjective,
-    email: Faker.Internet.email, user_id: u.id, status: status}
+    email: Faker.Internet.email, user_id: u.id, status: "inactive"}
 end
 
 [
   %Service{
     name: Faker.Commerce.product_name_adjective, status: "offline",
     server_id: Enum.at(servers, 0).id, request_url: "http://localhost:4005/ping",
-    expected_response: ~s({"response": "pong"})
+    expected_response: ~s({"response":"pong"})
   },
   %Service{
     name: Faker.Commerce.product_name_adjective, status: "offline",
-    server_id: Enum.at(servers, 1).id, request_url: "http://localhost:4006/ping",
-    expected_response: ~s({"response": "pong"})
+    server_id: Enum.at(servers, 0).id, request_url: "http://localhost:4006/ping",
+    expected_response: ~s({"response":"pong"})
+  },
+  %Service{
+    name: Faker.Commerce.product_name_adjective, status: "offline",
+    server_id: Enum.at(servers, 1).id, request_url: "http://localhost:4007/ping",
+    expected_response: ~s({"response":"pong"})
   },
 ]
 |> Enum.each(&(Repo.insert! &1))

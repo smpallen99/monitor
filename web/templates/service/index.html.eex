@@ -15,7 +15,7 @@
 <%= for service <- @services do %>
     <tr>
       <td><%= service.name %></td>
-      <td><%= service.email || "<<DEFAULT>>" %></td>
+      <td><%= String.slice (service.email || ""), 0, 22 %></td>
       <td><%= display_status service %></td>
       <td><%= link service.server.name, to: server_path(@conn, :show, service.server) %></td>
 

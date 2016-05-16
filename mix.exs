@@ -19,7 +19,7 @@ defmodule Monitor.Mixfile do
   def application do
     [mod: {Monitor, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex]]
+                    :phoenix_ecto, :postgrex, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -32,11 +32,12 @@ defmodule Monitor.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.1.4"},
      {:postgrex, ">= 0.0.0"},
-     {:phoenix_ecto, "~> 2.0"},
+     {:phoenix_ecto, "~> 3.0.0-rc.0"},
      {:phoenix_html, "~> 2.4"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:gettext, "~> 0.9"},
      {:faker, "~> 0.6.0"},
+     {:httpoison, "~> 0.8.3"},
      {:cowboy, "~> 1.0"}]
   end
 

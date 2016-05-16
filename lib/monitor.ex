@@ -13,6 +13,7 @@ defmodule Monitor do
       supervisor(Monitor.Repo, []),
       # Here you could define other workers and supervisors as children
       # worker(Monitor.Worker, [arg1, arg2, arg3]),
+      worker(Monitor.Registry, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

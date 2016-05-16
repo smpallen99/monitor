@@ -6,7 +6,10 @@ defmodule Monitor.ServiceController do
   plug :scrub_params, "service" when action in [:create, :update]
 
   def index(conn, _params) do
-    services = Repo.all(Service) |> Repo.preload(:server)
+
+    services =
+      from(s in Service, order_by: [asc: s.id], preload: [:server])
+      |> Repo.all
     render(conn, "index.html", services: services)
   end
 
@@ -29,7 +32,7 @@ defmodule Monitor.ServiceController do
   end
 
   def show(conn, %{"id" => id}) do
-    service = Repo.get!(Service, id)
+    service = Repo.get!(Service, id) |> Repo.preload(:server)
     render(conn, "show.html", service: service)
   end
 

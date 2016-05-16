@@ -13,9 +13,6 @@ defmodule Monitor.Server do
     timestamps
   end
 
-  @required_fields ~w(name  status user_id)
-  @optional_fields ~w(email)
-
   @doc """
   Creates a changeset based on the `model` and `params`.
 
@@ -24,9 +21,17 @@ defmodule Monitor.Server do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, ~w(email name status user_id))
+    |> validate_required([:name, :user_id])
     |> validate_inclusion(:status, status_options)
   end
 
+  def set_status(server, true) do
+    changeset(server, %{status: "online"})
+  end
+
+  def set_status(server, false) do
+    changeset(server, %{status: "offline"})
+  end
   def status_options, do: @status_options
 end
