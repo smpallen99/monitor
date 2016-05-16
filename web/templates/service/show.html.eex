@@ -1,4 +1,4 @@
-<h2>Show service</h2>
+<h2>Service <%= @service.name %> - <%= display_status @service %></h2>
 
 <ul>
 
@@ -14,7 +14,7 @@
 
   <li>
     <strong>Status:</strong>
-    <%= @service.status %>
+    <%= display_status @service %>
   </li>
 
   <li>

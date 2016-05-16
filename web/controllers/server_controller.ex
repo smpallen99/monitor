@@ -6,7 +6,7 @@ defmodule Monitor.ServerController do
   plug :scrub_params, "server" when action in [:create, :update]
 
   def index(conn, _params) do
-    servers = Repo.all(Server)
+    servers = Repo.all(Server) |> Repo.preload([:user, :services])
     render(conn, "index.html", servers: servers)
   end
 
@@ -29,7 +29,7 @@ defmodule Monitor.ServerController do
   end
 
   def show(conn, %{"id" => id}) do
-    server = Repo.get!(Server, id)
+    server = Repo.get!(Server, id) |> Repo.preload([:services, :user])
     render(conn, "show.html", server: server)
   end
 

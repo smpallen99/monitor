@@ -7,6 +7,7 @@
       <th>Email</th>
       <th>Status</th>
       <th>User</th>
+      <th>#</th>
 
       <th></th>
     </tr>
@@ -15,9 +16,10 @@
 <%= for server <- @servers do %>
     <tr>
       <td><%= server.name %></td>
-      <td><%= server.email %></td>
-      <td><%= server.status %></td>
-      <td><%= server.user_id %></td>
+      <td><%= server.email || "<<DEFAULT>>" %></td>
+      <td><%= display_status server %></td>
+      <td><%= link server.user.name, to: user_path(@conn, :show, server.user) %></td>
+      <td><%= Enum.count server.services %></td>
 
       <td class="text-right">
         <%= link "Show", to: server_path(@conn, :show, server), class: "btn btn-default btn-xs" %>

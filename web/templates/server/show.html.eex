@@ -1,4 +1,4 @@
-<h2>Show server</h2>
+<h2>Server <%= @server.name %> - <%= display_status @server %></h2>
 
 <ul>
 
@@ -14,15 +14,35 @@
 
   <li>
     <strong>Status:</strong>
-    <%= @server.status %>
+    <%= display_status @server %>
   </li>
 
   <li>
     <strong>User:</strong>
-    <%= @server.user_id %>
+    <%= @server.user.name %>
   </li>
 
 </ul>
+
+<h3>Services</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for service <- @server.services do %>
+      <tr>
+        <td><%= link service.name, to: service_path(@conn, :show, service) %></td>
+        <td><%= service.email || "<<DEFAULT>>" %></td>
+        <td><%= display_status service %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
 <%= link "Edit", to: server_path(@conn, :edit, @server) %>
 <%= link "Back", to: server_path(@conn, :index) %>

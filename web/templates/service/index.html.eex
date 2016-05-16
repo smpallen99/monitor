@@ -6,8 +6,6 @@
       <th>Name</th>
       <th>Email</th>
       <th>Status</th>
-      <th>Request url</th>
-      <th>Expected response</th>
       <th>Server</th>
 
       <th></th>
@@ -17,11 +15,9 @@
 <%= for service <- @services do %>
     <tr>
       <td><%= service.name %></td>
-      <td><%= service.email %></td>
-      <td><%= service.status %></td>
-      <td><%= service.request_url %></td>
-      <td><%= service.expected_response %></td>
-      <td><%= service.server_id %></td>
+      <td><%= service.email || "<<DEFAULT>>" %></td>
+      <td><%= display_status service %></td>
+      <td><%= link service.server.name, to: server_path(@conn, :show, service.server) %></td>
 
       <td class="text-right">
         <%= link "Show", to: service_path(@conn, :show, service), class: "btn btn-default btn-xs" %>

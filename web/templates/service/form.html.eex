@@ -18,8 +18,14 @@
   </div>
 
   <div class="form-group">
+    <%= label f, :server_id, class: "control-label" %>
+    <%= select f, :server_id, server_select, class: "form-control" %>
+    <%= error_tag f, :server_id %>
+  </div>
+
+  <div class="form-group">
     <%= label f, :status, class: "control-label" %>
-    <%= text_input f, :status, class: "form-control" %>
+    <%= select f, :status, Monitor.Server.status_options, class: "form-control" %>
     <%= error_tag f, :status %>
   </div>
 

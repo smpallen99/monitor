@@ -1,10 +1,11 @@
 defmodule Monitor.Service do
   use Monitor.Web, :model
 
+
   schema "services" do
     field :name, :string
     field :email, :string
-    field :status, :string
+    field :status, :string, default: hd(Monitor.Server.status_options)
     field :request_url, :string
     field :expected_response, :string
     belongs_to :server, Monitor.Server
@@ -25,4 +26,5 @@ defmodule Monitor.Service do
     model
     |> cast(params, @required_fields, @optional_fields)
   end
+
 end
