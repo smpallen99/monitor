@@ -77,11 +77,10 @@ defmodule Monitor.ServerController do
       _ ->
         case Registry.get :server, id do
           nil ->
-            Logger.info ".....server conroller staring server sm #{id}"
             Monitor.Supervisor.start_server_sm(id)
             %{response: "service started"}
           pid ->
-            ServerSm.pong(pid)
+            ServerSm.ping(pid)
             %{response: "pong"}
         end
     end

@@ -55,15 +55,20 @@ socket.connect()
 
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel("monitor:updates", {})
+
 let reload_needed = false
+
+// Added this handler to show warning box if the server goes down
 socket.onError( msg => {
   console.log("Received Channel onError event")
   reload_needed = true
   $('.server-alert').show()
 })
+
 channel.join()
   .receive("ok", resp => {
     if (reload_needed) {
+      // reload the page if we had lost the channel do show correct status info
       reload_needed = false
       location.reload()
     }
@@ -75,11 +80,13 @@ channel.join()
   })
 
 channel.on("server:status_update", msg => {
+  // update the appropriate server status indicators
   console.log('server:update', msg)
   let item = $('span.status[data-type="Server"][data-id="'+msg.id+'"]')
   item.attr('class', msg.klass).text(msg.status)
 })
 channel.on("service:status_update", msg => {
+  // update the appropriate service status indicators
   console.log('service:update', msg)
   let item = $('span.status[data-type="Service"][data-id="'+msg.id+'"]')
   item.attr('class', msg.klass).text(msg.status)

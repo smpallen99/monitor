@@ -1,4 +1,7 @@
 defmodule Monitor.Registry do
+  @moduledoc """
+  Simple registry for managing pid lookups.
+  """
 
   @default %{server: %{}, service: %{}, server_sup: %{}}
 
@@ -10,6 +13,13 @@ defmodule Monitor.Registry do
     Agent.get __MODULE__, fn(state) -> state end
   end
 
+  @doc """
+  Get the pid for a specific key.
+
+  ## Examples:
+
+      Monitor.Registry.get(:server, 1)
+  """
   def get(key, id) do
     Agent.get __MODULE__, fn(state) -> state[key][id] end
   end

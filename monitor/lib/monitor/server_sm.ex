@@ -1,4 +1,15 @@
 defmodule Monitor.ServerSm do
+  @moduledoc """
+  The Server worker process.
+
+  Responsible for timing updates from a server and notifying if there server
+  stops pinging.
+
+  At this point, the only notification that has been implemented is a channel
+  broadcast to the client, displaying the offline status.
+
+  This module can be extended to send other notifications like email, text, etc.
+  """
   use GenServer
   require Logger
   import Monitor.ServerHelpers
@@ -10,22 +21,42 @@ defmodule Monitor.ServerSm do
     defstruct active?: false, id: nil, services: [], timer_ref: nil
   end
 
+  #############
+  # Public API
+
   def start_link(id) do
     GenServer.start_link(__MODULE__, [id])
   end
 
-  def pong(pid),
-    do: GenServer.cast(pid, :pong)
+  @doc """
+  The API indicating that the server has pinged the web service.
 
+  This indicates that the server is still alive.
+  """
+  def ping(pid),
+    do: GenServer.cast(pid, :ping)
+
+  @doc """
+  The API to stop the server_sm process.
+  """
   def stop(pid),
     do: GenServer.cast(pid, :stop)
 
+  #############
+  # Callbacks
+
   def init([id]) do
     Registry.put :server, id, self()
+
+    # defer starting the services until this process initialization finishes
     GenServer.cast self(), :init
     {:ok, %State{id: id}}
   end
 
+
+  # Handle the initialization.
+  # This needs to run after `init` completes since it uses the Supervisor
+  # to start the services. If run from `init`, a deadlock situation occurs.
   def handle_cast(:init, state) do
     services =
       Repo.get!(Server, state.id)
@@ -41,36 +72,8 @@ defmodule Monitor.ServerSm do
     {:stop, :normal, state}
   end
 
-  def terminate(reason, state) do
-    Registry.delete(:server, state.id)
-
-    Repo.get!(Server, state.id)
-    |> Server.set_status(false)
-    |> Repo.update!
-
-    Repo.get!(Server, state.id)
-    |> Repo.preload(:services)
-    |> shutdown_services(state)
-
-    spawn fn ->
-      :timer.sleep(1000)
-      Registry.get(:server_sup, state.id)
-      |> Supervisor.stop
-
-      Registry.delete(:server_sup, state.id)
-    end
-  end
-
-  defp shutdown_services(server, state) do
-    for service <- server.services do
-      Registry.get(:service, service.id)
-      |> ServiceSm.stop()
-    end
-  end
-
-  def handle_cast(:pong, state) do
+  def handle_cast(:ping, state) do
     server = Repo.get!(Server, state.id)
-    # Logger.debug "pong from #{state.id}, active?: #{state.active?}, status: #{server.status}"
     case server.status do
       "inactive" ->
         state
@@ -104,6 +107,37 @@ defmodule Monitor.ServerSm do
     |> do_noreply
   end
 
+  def terminate(reason, state) do
+    Registry.delete(:server, state.id)
+
+    Repo.get!(Server, state.id)
+    |> Server.set_status(false)
+    |> Repo.update!
+
+    Repo.get!(Server, state.id)
+    |> Repo.preload(:services)
+    |> shutdown_services(state)
+
+    # I don't think the deferred execution is needed here...
+    spawn fn ->
+      :timer.sleep(1000)
+      Registry.get(:server_sup, state.id)
+      |> Supervisor.stop
+
+      Registry.delete(:server_sup, state.id)
+    end
+  end
+
+  #############
+  # Private Helpers
+
+  defp shutdown_services(server, state) do
+    for service <- server.services do
+      Registry.get(:service, service.id)
+      |> ServiceSm.stop()
+    end
+  end
+
   defp start_timer(state) do
     cancel_timer(state)
     timer_ref = :erlang.start_timer @watchdog, self(), :watchdog_timeout
@@ -122,7 +156,6 @@ defmodule Monitor.ServerSm do
     end
   end
   defp start_services(server) do
-    Logger.info "starting services for server #{server.id}"
     for service <- server.services do
       start_service(server, service)
     end
@@ -132,9 +165,6 @@ defmodule Monitor.ServerSm do
     id
   end
   defp start_service(server, %Service{id: id}) do
-    Logger.info "starting service for server #{server.id}, id: #{id}"
-    # require IEx
-    # IEx.pry
     Registry.get(:server_sup, server.id)
     |> Monitor.ServerSmSupervisor.start_service_sm(id)
     id

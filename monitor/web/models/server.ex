@@ -27,20 +27,18 @@ defmodule Monitor.Server do
   end
 
   def set_status(server, true) do
-    # Monitor.MonitorChannel.broadcast :server, %{id: server.id, status: "online"}
     broadcast_update(:server, server, "online" )
     changeset(server, %{status: "online"})
   end
 
   def set_status(server, false) do
-    # Monitor.MonitorChannel.broadcast :server, %{id: server.id, status: "offline"}
     broadcast_update(:server, server, "offline" )
     changeset(server, %{status: "offline"})
   end
 
   def broadcast_update(which, model, status) do
     Monitor.MonitorChannel.broadcast which, %{id: model.id, status: status,
-    klass: "status " <> Monitor.ViewHelpers.status_class(status) }
+      klass: "status " <> Monitor.ViewHelpers.status_class(status) }
   end
   def status_options, do: @status_options
 end
